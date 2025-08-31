@@ -1,0 +1,18 @@
+class Maze():
+    def __init__(self,Map,Col,Row):
+        self.Map = Map
+        self.Col = Col
+        self.Row = Row
+    
+    def Maze_Solver(self):
+        for i in range(self.Row):
+            for j in range(self.Col):
+                if self.Map[i][j] == 0
+                Pos_x = j
+                Pos_y = i
+                break #Identifying the starting point
+        
+        Temp_map = [[float('inf')]]
+    
+
+Test = Maze([[0,-1,-1,-1],[1,1,-1,1],[-1,1,-1,-1],[1,1,1,2]],4,4)
