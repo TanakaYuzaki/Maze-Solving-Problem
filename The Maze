@@ -1,31 +1,42 @@
 class Maze():
     def __init__(self,Map,Col,Row):
-        self.Map = Map
-        self.Col = Col
-        self.Row = Row
-        self.Path = []
+        self.Map = Map #The Map for the maze
+        self.Col = Col #Identifying the number of Column
+        self.Row = Row #Identifying the number of Row
+        self.Path = [] #Tracking the solution (Only if exist)
     
     def Maze_Solver(self):
+        Pos_r, Pos_c = None,None #Identifying the starting point
+        visited = set() # Tracking visited cells
         for i in range(self.Row):
             for j in range(self.Col):
                 if self.Map[i][j] == 0:
-                    Pos_r = j
-                    Pos_c = i
-                    break #Identifying the starting point
-        
-    
-        Res = self.Map
-        visited = set()
+                    Pos_r = i
+                    Pos_c = j
+                    break
+            if self.Map[i][j] == 0:
+                break
         
         
         def dfs(r,c,visited):
-            if (r < 0 or c < 0 or c >= Col or r >= Row) or ((r,c) in visited) or self.Map[r][c] == -1:
-                return False
+            if (r < 0 or c < 0 or c >= self.Col or r >= self.Row) or ((r,c) in visited) or self.Map[r][c] == -1:
+                return False #the condition to break
+            
+            self.Path.append((r,c)) #Append the solution path
+            visited.add((r,c)) #Append the visited cells
             if self.Map[r][c] == 2:
                 return True
             
-            visited.add((r,c))
-            if dfs(r+1,c,visited):
-    
-
-Test = Maze([[0,-1,-1,-1],[1,1,-1,1],[-1,1,-1,-1],[1,1,1,2]],4,4)
+            directions = [(1,0),(0,1),(-1,0),(0,-1)]
+            for dr, dc in directions:
+                new_r = dr + r #Move by r from the starting row
+                new_c = dc + c #Move by c from the starting column
+                if dfs(new_r,new_c,visited): #if the goal is reached, return True
+                    return True
+            self.Path.pop() #Remove the path because it is not correct
+            return False
+        
+        if dfs(Pos_r,Pos_c ,visited): #Initialing DFS to see if there is a path or not, with the function being right inside the class
+            return self.Path
+        else:
+            return False
