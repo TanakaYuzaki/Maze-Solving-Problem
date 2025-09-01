@@ -3,16 +3,29 @@ class Maze():
         self.Map = Map
         self.Col = Col
         self.Row = Row
+        self.Path = []
     
     def Maze_Solver(self):
         for i in range(self.Row):
             for j in range(self.Col):
-                if self.Map[i][j] == 0
-                Pos_x = j
-                Pos_y = i
-                break #Identifying the starting point
+                if self.Map[i][j] == 0:
+                    Pos_r = j
+                    Pos_c = i
+                    break #Identifying the starting point
         
-        Temp_map = [[float('inf')]]
+    
+        Res = self.Map
+        visited = set()
+        
+        
+        def dfs(r,c,visited):
+            if (r < 0 or c < 0 or c >= Col or r >= Row) or ((r,c) in visited) or self.Map[r][c] == -1:
+                return False
+            if self.Map[r][c] == 2:
+                return True
+            
+            visited.add((r,c))
+            if dfs(r+1,c,visited):
     
 
 Test = Maze([[0,-1,-1,-1],[1,1,-1,1],[-1,1,-1,-1],[1,1,1,2]],4,4)
