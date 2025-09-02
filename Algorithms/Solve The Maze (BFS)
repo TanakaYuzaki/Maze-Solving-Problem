@@ -1,0 +1,54 @@
+from collections import deque
+class Maze:
+    def __init__(self, Map, Col, Row):
+        self.Map = Map
+        self.Col = Col
+        self.Row = Row
+        self.Path = []
+
+    
+    def Maze_Solver(self):
+        # Find start point
+        Pos_r, Pos_c = None, None
+        for i in range(self.Row):
+            for j in range(self.Col):
+                if self.Map[i][j] == 0:
+                    Pos_r, Pos_c = i, j
+                    break
+            if Pos_r is not None:
+                break
+        
+        if Pos_r is None or Pos_c is None:
+            return False  # No start point found
+        
+        
+        
+        def BFS(Start_r, Start_c):
+            visited = set()
+            q = deque()
+            q.append((Start_r,Start_c,0))
+            direction = [(1,0),(-1,0),(0,1),(0,-1)]
+            while q:
+                current_r, current_c, s = q.popleft()
+                for dr,dc in direction:
+                    new_r = dr + current_r
+                    new_c = dc + current_c
+                    new_s = s + 1
+                    if (new_r >= 0 and new_c >= 0 and new_r < self.Row and new_c < self.Col) and self.Map[new_r][new_c] == 2:
+                        return new_s
+                    else:
+                        if (new_r >= 0 and new_c >= 0 and new_r < self.Row and new_c < self.Col) and ((new_r,new_c) not in visited):
+                            q.append((new_r,new_c,new_s))
+            return False
+                    
+                
+                
+                
+    
+        return BFS(Pos_r,Pos_c)
+            
+            
+            
+    
+Test = Maze([[0,  1, -1], [-1, 1, -1],[-1, 1,  2]],3,3)
+print(Test.Maze_Solver())
