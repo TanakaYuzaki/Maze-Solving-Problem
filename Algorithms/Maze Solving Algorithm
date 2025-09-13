@@ -1,13 +1,15 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import random
-from queue import Queue
+from collections import deque
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 class Maze:
     def __init__(self):
         self.M = None
         self.Dim = None
-        self.path = [(0,0)]
+        self.path = None
     
     def Generate_Maze(self,dim):
         maze = np.ones((dim*2+1,dim*2+1))
@@ -33,37 +35,32 @@ class Maze:
         self.M = maze
         self.Dim = dim
     
-    def DFS(self):
-        s_r,s_e = 0,0
-        stacks = [(s_r,s_e)]
-        visited = set()
-        while stacks:
-            cr, cc = stacks[-1]
-            visited.add((cr,cc))
-            directions = [(1,0),(-1,0),(0,1),(0,-1)]
-            random.shuffle(directions)
+    def Solve(self):
+        directions = [(1,0),(-1,0),(0,1),(0,-1)]
+        start = (1,1)
+        end = (self.M.shape[0]-1,self.M.shape[1]-1)
+        visited = np.zeros_like(self.M,dtype = bool)
+        visited[(1,1)] = True
+        queue = deque()
+        queue.append((start,[]))
+        while queue:
+            node,path = queue.pop()
             for dr,dc in directions:
-                nr = dr + cr
-                nc = dc + cc
-                if cc == self.Dim-1 and self.M[2*cr+1][2*cc+1+1] == 0:
-                    return self.path
-                if nr >= 0 and nc >= 0 and nr < self.Dim and (nr,nc) not in visited and nc < self.Dim and self.M[2*cr+1+dr][2*cc+1+dc] == 0:
-                    stacks.append((nr,nc))
-                    self.path.append((nr,nc))
-                    break
-            else:
-                stacks.pop()
-                self.path.pop()
-        return False
-                    
+                next_node = (node[0] + dr,node[1] + dc)
+                if next_node == end:
+                    self.path = path
+                    return path
                 
+                if (next_node[0] >= 0 and next_node[1] >= 0 and next_node[0] < self.M.shape[0] and next_node[1] < self.M.shape[1] and self.M[next_node] == 0 and not visited[next_node]):
+                    visited[next_node] = True
+                    queue.append((next_node,path+[node]))
+        
+                    
+        
+        
         
     
-                
-    
-                
-            
 Test = Maze()
-Test.Generate_Maze(100)
+Test.Generate_Maze(20)
 print(Test.M)
-print(Test.DFS())
+print(Test.Solve())
