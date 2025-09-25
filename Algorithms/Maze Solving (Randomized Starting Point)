@@ -1,0 +1,106 @@
+import numpy as np
+import random
+from collections import deque
+import math
+
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
+class Maze:
+    def __init__(self):
+        self.M = None
+        self.path = None
+        self.start = None
+        
+    def Generate_Maze(self,n,m,Random_Start = False):
+        maze = np.ones((2*n+1,2*m+1))
+        maze[1][0] = 0
+        maze[-2][-1] = 0
+        start = (0,0)
+        if Random_Start == True:
+            start = (math.ceil(random.randint(0,n//2)),math.ceil(random.randint(0,m//2)))
+            self.start = (2*start[0]+1,2*start[1]+1)
+        Stacks = [start]
+        while Stacks:
+            directions = [(1,0),(-1,0),(0,1),(0,-1)]
+            random.shuffle(directions)
+            r,c = Stacks[-1]
+            for dr,dc in directions:
+                nr = r + dr
+                nc = c + dc
+                if nr >= 0 and nc >= 0 and nr < n and nc < m and maze[2*nr+1][2*nc+1] != 0:
+                    maze[2*nr+1][2*nc+1] = 0
+                    maze[2*r+1+dr][2*c+1+dc] = 0
+                    Stacks.append((nr,nc))
+                    break
+            else:
+                Stacks.pop()
+        self.M = maze
+    
+    
+    def Solve(self):
+        directions = [(1,0),(-1,0),(0,1),(0,-1)]
+        start = (1,1)
+        if self.start:
+            start = self.start
+        end = (self.M.shape[0]-1,self.M.shape[1]-1)
+        visited = np.zeros_like(self.M,dtype = bool)
+        visited[(1,1)] = True
+        queue = deque()
+        queue.append((start,[]))
+        while queue:
+            node,path = queue.pop()
+            for dr,dc in directions:
+                next_node = (node[0] + dr,node[1] + dc)
+                if next_node == end:
+                    self.path = path
+                    return path
+                
+                if (next_node[0] >= 0 and next_node[1] >= 0 and next_node[0] < self.M.shape[0] and next_node[1] < self.M.shape[1] and self.M[next_node] == 0 and not visited[next_node]):
+                    visited[next_node] = True
+                    queue.append((next_node,path+[node]))
+                    
+    def draw_maze(self):
+        fig,ax = plt.subplots(figsize = (10,10)) #Identifying the size of the figure within plt
+        ax.imshow(self.M, cmap = plt.cm.binary, interpolation='nearest') #plotting the maze first
+
+        ax.set_xticks([]) #setting x as None
+        ax.set_yticks([]) #setting y as None
+        if self.path:
+            x = [x[1] for x in self.path] #column = x in cartesian
+            y = [y[0] for y in self.path] #row = y in cartesian
+            plt.plot(x,y,color='green',linewidth = 3)
+        plt.show()
+        
+    def animate_maze(self):
+        fig,ax = plt.subplots(figsize = (10,10))
+        ax.imshow(self.M,cmap = plt.cm.binary,interpolation='nearest')
+        
+        ax.set_xticks([]) #setting x as None
+        ax.set_yticks([]) #setting y as None
+        
+        if self.path is not None:
+            line, = ax.plot([], [], color='green', linewidth=2)
+            
+            def init():
+                line.set_data([], [])
+                return line,
+            
+            def update(frame):
+                x, y = self.path[frame] #path[0]'s data = (x,y
+                line.set_data(*zip(*[(p[1], p[0]) for p in self.path[:frame+1]]))  # update the data with cartesian coordinate
+                return line,
+            
+            ani = animation.FuncAnimation(fig, update, init_func=init,frames=range(len(self.path)), blit=True, repeat = False, interval=20)
+            
+        plt.show()
+            
+        
+
+    
+        
+        
+A = Maze()
+A.Generate_Maze(5,5,True)
+A.Solve()
+A.draw_maze()
